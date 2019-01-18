@@ -1,5 +1,4 @@
 local Log = class{
-	loggers = {},
 	init = function(self, logger, text)
 		self.text = text
 		self.logger = logger
@@ -22,16 +21,6 @@ local Log = class{
 }
 
 local Logger = class{
-	colors = {
-		black = {0,0,0},
-		white = {1,1,1},
-		grey = {.4,.4,.4},
-		red = {.7,.3,.3},
-		green = {.3,.7,.3},
-		blue = {.3,.3,.7},
-
-	},
-
 	loggers = {},
 	init = function(self, x, y, width, height)
 		self.logs = {}
@@ -40,7 +29,13 @@ local Logger = class{
 		self.width = width
 		self.height = height
 
-		self.color = self.colors.grey
+		self.color = ui.colors.grey
+
+		self.border = true
+		self.borderWidth = 5
+		self.borderColor = ui.colors.red
+
+		self.round = 5
 
 		self.offset = 14
 
@@ -68,12 +63,20 @@ local Logger = class{
 	--CLASSMETHODS
 	draw = function(cls)
 		for k, logger in pairs(cls.loggers) do
+			--Border
+			if logger.border then
+				line.set(logger.borderWidth)
+				love.graphics.setColor(logger.borderColor)
+				love.graphics.rectangle("line", logger.x, logger.y, logger.width, logger.height, logger.round, logger.round)
+				line.pop()
+			end
+			--Start cutoff
 			love.graphics.setScissor(logger.x, logger.y, logger.width, logger.height)
 			----------------
 			love.graphics.setColor(logger.color)
-			love.graphics.rectangle("fill", logger.x, logger.y, logger.width, logger.height, 5, 5)
+			love.graphics.rectangle("fill", logger.x, logger.y, logger.width, logger.height, logger.round, logger.round)
 			--Draw logs
-			love.graphics.setColor(cls.colors.white)
+			love.graphics.setColor(ui.colors.white)
 			for k, log in pairs(logger.logs) do
 				love.graphics.print(log.text, log.x, log.y)
 			end
